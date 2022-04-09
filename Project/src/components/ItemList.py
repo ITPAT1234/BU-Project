@@ -13,7 +13,7 @@ def mainwindow():
     root.config(bg='#D9BA82')
     root.title("BU Market APP ")
     root.option_add('*font', "Garamond 22 bold")
-    root.rowconfigure((0, 1, 4, 5, 9), weight=1)
+    root.rowconfigure((0,1,2,3), weight=1)
     root.columnconfigure((0, 1, 2, 3), weight=1)
     return root
 
@@ -28,39 +28,54 @@ def renderItemList(root):
     cursor.execute(Fetch)
     FetchData = cursor.fetchall()
     renderFrame = Frame(root)
+    renderFrame.rowconfigure((0, 1, 4, 5, 9), weight=1)
+    renderFrame.columnconfigure((0, 1, 2, 3), weight=1)
     firstColumn = FetchData[:4]
     secondColumn = FetchData[4:]
-    print(firstColumn, secondColumn)
     for i in range(len(firstColumn)):
         itemCard = LabelFrame(renderFrame).grid(row=1)
-        Label(itemCard, image=pic, bg='#F2F2F2',
+        Label(renderFrame, image=pic, bg='#F2F2F2',
               width=200).grid(row=1, column=i, sticky="ns")
-        Label(itemCard, text=firstColumn[i][1], width=11).grid(
-            row=1, column=i, sticky="S")
-        Label(itemCard, text=firstColumn[i][0], width=12).grid(
+        Label(renderFrame, text=firstColumn[i][1], width=11).grid(
             row=2, column=i, sticky="S")
-        Button(itemCard, text="Detail", width=12).grid(row=3, column=i)
+        Label(renderFrame, text=firstColumn[i][0], width=12).grid(
+            row=3, column=i, sticky="S")
+        Button(renderFrame, text="Detail", width=12,bd=0,bg="#A67360").grid(row=4, column=i)
 
     if secondColumn:
         for i in range(len(secondColumn)):
-            itemCard = LabelFrame(renderFrame).grid(row=1)
-            Label(itemCard, image=pic4, bg='#F2F2F2',
-                  width=200).grid(row=5, column=i, sticky="ns")
-            Label(itemCard, text=secondColumn[i][1], width=12).grid(
-                row=6, column=i, sticky="S")
-            Label(itemCard, text=secondColumn[i][0], width=12).grid(
+            itemCard = LabelFrame(renderFrame).grid(row=5)
+            Label(renderFrame, image=pic3, bg='#F2F2F2',
+                  width=200).grid(row=6, column=i, sticky="ns")
+            Label(renderFrame, text=secondColumn[i][1], width=12).grid(
                 row=7, column=i, sticky="S")
-            Button(itemCard, text="Detail", width=12).grid(row=8, column=i)
+            Label(renderFrame, text=secondColumn[i][0], width=12).grid(
+                row=8, column=i, sticky="S")
+            Button(renderFrame, text="Detail", width=12,bd=0,bg="#A67360").grid(row=9, column=i,padx=10)
 
             Button(itemCard, text="Profile", bg="#A67360", fg="#F2F2F2").grid(
-                row=9, column=3, sticky="e", padx=50, columnspan=2)
+                row=3, column=3, sticky="e", padx=50, columnspan=2)
 
-    renderFrame.grid(row=0, column=0)
+    renderFrame.grid(row=1, column=0,columnspan=4)
 
 
 w = 1000
 h = 800
 root = mainwindow()
+#imageList = {
+#    "1" : ["../../images/Food1.png",None],
+#    "2" : ["../../images/book1.png",None],
+#    "3" : ["../../images/cat1.png",None],
+#    "4" : ["../../images/pen.png",None],
+#}
+#
+#def getImg(index):
+#    if index in imageList:
+#        if imageList[index][1] is None:
+#            print("loading image:", index)
+#            imageList[index][1] = PhotoImage(file=imageList[index][0])
+#        return imageList[index][1]
+#    return None
 pic = PhotoImage(file="../../images/Food1.png").subsample(3, 3)
 pic2 = PhotoImage(file="../../images/book1.png").subsample(3, 3)
 pic3 = PhotoImage(file="../../images/cat1.png").subsample(3, 3)
