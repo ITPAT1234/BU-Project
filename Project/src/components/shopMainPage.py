@@ -13,7 +13,7 @@ def mainwindow():
     root.config(bg='#D9BA82')
     root.title("BU Market APP ")
     root.option_add('*font', "Garamond 22 bold")
-    root.rowconfigure((0,1,2,3), weight=1)
+    root.rowconfigure((0, 1, 2, 3), weight=1)
     root.columnconfigure((0, 1, 2, 3), weight=1)
     return root
 
@@ -40,7 +40,8 @@ def renderItemList(root):
             row=2, column=i, sticky="S")
         Label(renderFrame, text=firstColumn[i][0], width=12).grid(
             row=3, column=i, sticky="S")
-        Button(renderFrame, text="Detail", width=12,bd=0,bg="#A67360").grid(row=4, column=i)
+        Button(renderFrame, text="Detail", width=12,
+               bd=0, bg="#A67360").grid(row=4, column=i)
 
     if secondColumn:
         for i in range(len(secondColumn)):
@@ -51,25 +52,26 @@ def renderItemList(root):
                 row=7, column=i, sticky="S")
             Label(renderFrame, text=secondColumn[i][0], width=12).grid(
                 row=8, column=i, sticky="S")
-            Button(renderFrame, text="Detail", width=12,bd=0,bg="#A67360").grid(row=9, column=i,padx=10)
+            Button(renderFrame, text="Detail", width=12, bd=0,
+                   bg="#A67360").grid(row=9, column=i, padx=10)
 
             Button(itemCard, text="Profile", bg="#A67360", fg="#F2F2F2").grid(
                 row=3, column=3, sticky="e", padx=50, columnspan=2)
 
-    renderFrame.grid(row=1, column=0,columnspan=4)
+    renderFrame.grid(row=1, column=0, columnspan=4)
 
 
 w = 1000
 h = 800
 root = mainwindow()
-#imageList = {
+# imageList = {
 #    "1" : ["../../images/Food1.png",None],
 #    "2" : ["../../images/book1.png",None],
 #    "3" : ["../../images/cat1.png",None],
 #    "4" : ["../../images/pen.png",None],
-#}
+# }
 #
-#def getImg(index):
+# def getImg(index):
 #    if index in imageList:
 #        if imageList[index][1] is None:
 #            print("loading image:", index)
