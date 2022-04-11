@@ -19,7 +19,6 @@ def mainwindow():
     root.columnconfigure((0, 1, 2, 3), weight=1)
     return root
 
-
 def mutiCount(FetchData, index):
     summary = 0
     for i in range(len(FetchData)):
@@ -28,7 +27,7 @@ def mutiCount(FetchData, index):
 
 
 def userOwnItem(root):
-    userID = 1
+    userID = 2
     fetch = f"""
 	SELECT Users.username,Items.itemName,Items.amount,Items.img_index,Items.sell_count
 	FROM Users
