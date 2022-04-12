@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 import sqlite3
 
 
@@ -66,6 +67,7 @@ def shopMainPage(root):
 
     renderFrame.grid(row=1, column=0, columnspan=4)
 
+
 def mutiCount(FetchData, index):
     summary = 0
     for i in range(len(FetchData)):
@@ -74,7 +76,12 @@ def mutiCount(FetchData, index):
 
 
 def userOwnItem(root):
-    userID = 2
+
+    global userOwnItemFrame
+    global BackButton
+    global AddItemPageButton
+
+    userID = 1
     fetch = f"""
 	SELECT Users.username,Items.itemName,Items.amount,Items.img_index,Items.sell_count
 	FROM Users
@@ -88,22 +95,22 @@ def userOwnItem(root):
     summarySell = mutiCount(FetchData, 4)
     summaryAmount = mutiCount(FetchData, 2)
     userOwnItemFrame = Frame(root, bg="#D9BA82")
-    renderItemListFrame = Frame(root, bg="#F2F2F2")
-    userOwnItemFrame.columnconfigure((0, 1, 2, 3), weight=1)
+    renderItemListFrame = Frame(userOwnItemFrame, bg="#F2F2F2")
+    userOwnItemFrame.columnconfigure((1, 2, 3), weight=1)
     userOwnItemFrame.rowconfigure((0, 1, 2, 3), weight=1)
-    Button(root, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2").grid(
+    BackButton = Button(userOwnItemFrame, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2").grid(
         row=0, column=0, sticky="NW", padx=10, pady=10)
-    Button(root, text="Add Item Page", bd=0, bg="#A67360", fg="#F2F2F2").grid(
+    AddItemPageButton = Button(userOwnItemFrame, text="Add Item Page", bd=0, bg="#A67360", fg="#F2F2F2", command=lambda: redirecToAddItemPage(userOwnItemFrame, userAddItemPage, userID)).grid(
         row=0, column=3, sticky="NE", padx=10, pady=10)
 
-    Label(userOwnItemFrame, image=LOGO, width=500, bg="#D9BA82").grid(
-        row=0, column=0, columnspan=4)
-    Label(userOwnItemFrame, text=("Username : %s" % FetchData[0][0]), bg="#F2CB9B", relief="solid").grid(
-        row=2, column=0, columnspan=4, pady=50, sticky="news")
-    Label(userOwnItemFrame, text=("Sold : %s" % (summarySell)), bg="#F2CB9B", relief="solid").grid(
-        row=3, column=0, columnspan=4, sticky="W", ipadx=10)
-    Label(userOwnItemFrame, text=("Supplies : %s" % (summaryAmount)), bg="#F2CB9B").grid(
-        row=3, column=0, columnspan=4, sticky="E")
+    Label(userOwnItemFrame, image=LOGO,  bg="#D9BA82").grid(
+        row=1, column=0, columnspan=4)
+    Label(userOwnItemFrame, text=("Username : %s" % FetchData[0][0]), width=15, bg="#F2CB9B", relief="solid").grid(
+        row=2, column=0, columnspan=4)
+    Label(userOwnItemFrame, text=("Sold : %s" % (summarySell)), width=10, bg="#F2CB9B", relief="solid").grid(
+        row=3, column=0, columnspan=4, sticky="W", padx=200)
+    Label(userOwnItemFrame, text=("Supplies : %s" % (summaryAmount)), width=10, bg="#F2CB9B", relief="solid").grid(
+        row=3, column=3, columnspan=4, sticky="E", padx=200)
 
     for i in range(len(FetchData)):
         Label(renderItemListFrame, image=getImg(FetchData[i][3])).grid(
@@ -113,12 +120,95 @@ def userOwnItem(root):
         Label(renderItemListFrame, text=("Supplies : %s" % FetchData[i][2])).grid(
             row=2, column=i, padx=30)
 
-    userOwnItemFrame.grid(row=0, column=0, columnspan=4)
-    renderItemListFrame.grid(row=1, column=0, columnspan=4)
+    userOwnItemFrame.place(x=0, y=0, width=w, height=h)
+    renderItemListFrame.grid(row=4, column=0, columnspan=4, pady=50)
+
+
+def userAddItemPage(root,userID):
+	
+    userAddItemPageFrame = Frame(root)
+    userAddItemPageFrame.columnconfigure((0, 1), weight=1)
+    itemPicListFrame = Frame(userAddItemPageFrame, bg="#F2F2F2")
+    userInputFrame = Frame(userAddItemPageFrame)
+
+    Button(root, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2", command=lambda : redirectTo(userAddItemPageFrame,userOwnItem)).grid(
+        row=0, column=0, sticky="NW", padx=10, pady=10)
+
+    Label(itemPicListFrame, image=pic).grid(row=0, column=0, padx=20, pady=20)
+    Label(itemPicListFrame, text="1 : Food").grid(row=1, column=0)
+    Label(itemPicListFrame, image=pic2).grid(row=0, column=1, padx=20, pady=20)
+    Label(itemPicListFrame, text="2 : Book").grid(row=1, column=1)
+    Label(itemPicListFrame, image=pic3).grid(row=2, column=0, padx=20, pady=20)
+    Label(itemPicListFrame, text="3 : Animal").grid(row=3, column=0)
+    Label(itemPicListFrame, image=pic4).grid(row=2, column=1, padx=20, pady=20)
+    Label(itemPicListFrame, text="4 : Stationery").grid(row=3, column=1)
+
+    Label(userInputFrame, text="Item Name").grid(
+        row=0, column=0, sticky="WN", columnspan=4)
+    Entry(userInputFrame, width=20, textvariable=getItemName).grid(
+        row=1, column=0, columnspan=4)
+    Label(userInputFrame, text="Amount").grid(
+        row=2, column=0, sticky="WN", columnspan=4)
+    Entry(userInputFrame, width=20, textvariable=getAmount).grid(
+        row=3, column=0, columnspan=4)
+    Label(userInputFrame, text="Price").grid(
+        row=4, column=0, sticky="WN", columnspan=4)
+    Entry(userInputFrame, width=20, textvariable=getPrice).grid(
+        row=5, column=0, columnspan=4)
+    Label(userInputFrame, text="Choose Images").grid(
+        row=6, column=0, sticky="WN", columnspan=4)
+    Spinbox(userInputFrame, from_=0, to=4,
+            textvariable=imageIndex).grid(row=7)
+    Button(userInputFrame, text="Submit", bd=0,
+           bg="#A67360", command=submit).grid(row=8, pady=20, sticky="news")
+
+    userAddItemPageFrame.grid(
+        row=0, column=0, columnspan=4, rowspan=4)
+    itemPicListFrame.grid(row=0, column=0)
+    userInputFrame.grid(row=0, column=2, padx=30)
+
+
+def imageIndexValue(index):
+    value = 0
+    if index == "1":
+        value = 0
+    elif index == "2":
+        value = 1
+    elif index == "3":
+        value = 2
+    elif index == "4":
+        value = 3
+    return value
+
+
+def submit():
+    itemName = getItemName.get()
+    userID = 1
+    amount = getAmount.get()
+    price = getPrice.get()
+    imgIndex = imageIndexValue(imageIndex.get())
+    insert = """
+        INSERT INTO Items(itemName,User_ID,amount,img_index,price)
+        VALUES (?,?,?,?,?)
+    """
+    cursor.execute(insert, [itemName, userID, amount, imgIndex, price])
+    connect.commit()
+    messagebox.showinfo("Admin : ", "Post a Product Success !!!")
+
 
 def getImg(index):
     imageList = [pic, pic2, pic3, pic4]
     return imageList[index]
+
+
+def redirectTo(currentFrame, goto):
+    currentFrame.destroy()
+    goto(root)
+
+
+def redirecToAddItemPage(currentFrame, goto, userID):
+    currentFrame.destroy()
+    goto(root, userID)
 
 
 w = 1000
@@ -130,6 +220,11 @@ pic = PhotoImage(file="../images/Food1.png").subsample(3, 3)
 pic2 = PhotoImage(file="../images/book1.png").subsample(3, 3)
 pic3 = PhotoImage(file="../images/cat1.png").subsample(3, 3)
 pic4 = PhotoImage(file="../images/pen.png").subsample(3, 3)
+getItemName = StringVar()
+getAmount = IntVar()
+imageIndex = StringVar()
+getPrice = StringVar()
+# userAddItemPage(root)
 userOwnItem(root)
-#shopMainPage(root)
+# shopMainPage(root)
 root.mainloop()

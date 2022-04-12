@@ -46,12 +46,16 @@ def userAddItemPage(root):
         row=2, column=0, sticky="WN", columnspan=4)
     Entry(userInputFrame, width=20, textvariable=getAmount).grid(
         row=3, column=0, columnspan=4)
-    Label(userInputFrame, text="Choose Images").grid(
+    Label(userInputFrame, text="Price").grid(
         row=4, column=0, sticky="WN", columnspan=4)
+    Entry(userInputFrame, width=20, textvariable=getPrice).grid(
+        row=5, column=0, columnspan=4)
+    Label(userInputFrame, text="Choose Images").grid(
+        row=6, column=0, sticky="WN", columnspan=4)
     Spinbox(userInputFrame, from_=0, to=4,
-            textvariable=imageIndex).grid(row=5)
+            textvariable=imageIndex).grid(row=7)
     Button(userInputFrame, text="Submit", bd=0,
-           bg="#A67360", command=submit).grid(row=6, pady=20, sticky="news")
+           bg="#A67360", command=submit).grid(row=8, pady=20, sticky="news")
 
     userAddItemPageFrame.grid(
         row=0, column=0, columnspan=4, rowspan=4)
@@ -76,12 +80,13 @@ def submit():
     itemName = getItemName.get()
     userID = 1
     amount = getAmount.get()
+    price = getPrice.get()
     imgIndex = imageIndexValue(imageIndex.get())
     insert = """
-        INSERT INTO Items(itemName,User_ID,amount,img_index)
-        VALUES (?,?,?,?)
+        INSERT INTO Items(itemName,User_ID,amount,img_index,price)
+        VALUES (?,?,?,?,?)
     """
-    cursor.execute(insert, [itemName, userID, amount, imgIndex])
+    cursor.execute(insert, [itemName, userID, amount, imgIndex, price])
     connect.commit()
     messagebox.showinfo("Admin : ", "Post a Product Success !!!")
 
@@ -92,6 +97,7 @@ root = mainwindow()
 getItemName = StringVar()
 getAmount = IntVar()
 imageIndex = StringVar()
+getPrice = StringVar()
 pic = PhotoImage(file="../../images/Food1.png").subsample(3, 3)
 pic2 = PhotoImage(file="../../images/book1.png").subsample(3, 3)
 pic3 = PhotoImage(file="../../images/cat1.png").subsample(3, 3)
