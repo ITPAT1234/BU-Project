@@ -22,14 +22,16 @@ def mainwindow():
     root.columnconfigure((0, 1, 2, 3), weight=1)
     return root
 
-
+# ShopMainPage
 def shopMainPage(root):
     Fetch = """
-        SELECT Users.username,Items.itemName,Items.img_index,Users.User_ID
+        SELECT Users.username,Items.itemName,Items.img_index,Users.User_ID,Items.Item_ID
         FROM Items
         INNER JOIN Users
         ON Items.User_ID = Users.User_ID
     """
+    global renderFrame
+
     cursor.execute(Fetch)
     FetchData = cursor.fetchall()
     renderFrame = Frame(root)
@@ -38,7 +40,6 @@ def shopMainPage(root):
     firstColumn = FetchData[:4]
     secondColumn = FetchData[4:8]
     thirdColumn = FetchData[8:]
-    print(firstColumn, secondColumn, thirdColumn)
     for i in range(len(firstColumn)):
         itemCard = LabelFrame(renderFrame).grid(row=1)
         Label(renderFrame, image=getImg(firstColumn[i][2]), bg='#F2F2F2',
@@ -47,7 +48,7 @@ def shopMainPage(root):
             row=2, column=i, sticky="S")
         Label(renderFrame, text=("Vendor : %s" % firstColumn[i][0]), width=12).grid(
             row=3, column=i, sticky="S")
-        Button(renderFrame, text="Detail", width=12,
+        Button(renderFrame, text="Detail", width=12,command=lambda i=i : redirectToItemDetail(firstColumn[i][4]) ,
                bd=0, bg="#A67360").grid(row=4, column=i)
 
     if secondColumn:
@@ -59,7 +60,7 @@ def shopMainPage(root):
                 row=7, column=i, sticky="S")
             Label(renderFrame, text=("Vendor : %s" % secondColumn[i][0]), width=12).grid(
                 row=8, column=i, sticky="S")
-            Button(renderFrame, text="Detail", width=12, bd=0,
+            Button(renderFrame, text="Detail", width=12, bd=0,command=lambda i=i :redirectToItemDetail(secondColumn[i][4]),
                    bg="#A67360").grid(row=9, column=i, padx=10)
 
             Button(itemCard, text="Profile", bg="#A67360", fg="#F2F2F2").grid(
@@ -68,12 +69,15 @@ def shopMainPage(root):
     renderFrame.grid(row=1, column=0, columnspan=4)
 
 
+def redirectToItemDetail(itemID):
+    itemDetailPage(root,itemID)
+
+# UserOwnItemPage
 def mutiCount(FetchData, index):
     summary = 0
     for i in range(len(FetchData)):
         summary += FetchData[i][index]
     return summary
-
 
 def userOwnItem(root):
 
@@ -123,7 +127,7 @@ def userOwnItem(root):
     userOwnItemFrame.place(x=0, y=0, width=w, height=h)
     renderItemListFrame.grid(row=4, column=0, columnspan=4, pady=50)
 
-
+# UserAddItemPage
 def userAddItemPage(root,userID):
 	
     userAddItemPageFrame = Frame(root)
@@ -195,6 +199,60 @@ def submit():
     connect.commit()
     messagebox.showinfo("Admin : ", "Post a Product Success !!!")
 
+# ITEMDetailPage
+def itemDetailPage(root, itemID):
+    fetch = f"""
+	SELECT Items.User_ID,Items.Item_ID,Users.username,Items.itemName,Items.amount,Items.img_index, Items.price
+	FROM Items
+	INNER JOIN Users
+	ON Users.User_ID = Items.User_ID
+	WHERE Items.Item_ID = ?
+ 	"""
+    global itemDetailFrame
+
+    cursor.execute(fetch, [itemID])
+    FetchData = cursor.fetchall()
+    itemDetailFrame = Frame(root, bg="#D9BA82")
+    itemDetailFrame.columnconfigure((0, 1), weight=1)
+    itemDetailFrame.rowconfigure((0, 1), weight=1)
+    itemImageFrame = Frame(itemDetailFrame)
+    itemInformationFrame = Frame(itemDetailFrame, bg="#D9BA82")
+    BackButton = Button(itemDetailFrame, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2",command=lambda :redirectTo(itemDetailFrame,shopMainPage)).grid(
+        row=0, column=0, sticky="NW", padx=10, pady=10)
+
+    Label(itemImageFrame, image=getImg(FetchData[0][5])).grid(row=0, column=0)
+
+    Label(itemInformationFrame, text=("Item Name : %s" %
+          FetchData[0][3]), width=20, height=2, anchor="w", relief="solid").grid(row=0, column=0, pady=10)
+    Label(itemInformationFrame, text=("Vendor Name : %s" %
+          FetchData[0][2]), width=20, height=2, anchor="w", relief="solid").grid(row=1, column=0, pady=10)
+    Label(itemInformationFrame, text=("Price (Bath) : %s" %
+          FetchData[0][6]), width=20, height=2, anchor="w", relief="solid").grid(row=2, column=0, pady=10)
+    Label(itemInformationFrame, text=("Item Amount : %s" %
+          FetchData[0][4]), width=20, height=2, anchor="w", relief="solid").grid(row=3, column=0, pady=10)
+
+    Button(itemDetailFrame, text="Add To Cart", bd=0, width=12,
+           bg="#A67360", fg="#F2F2F2", command=lambda: addToCart(FetchData)).grid(row=1, column=0)
+    Button(itemDetailFrame, text="Buy Now!", bd=0, width=12,
+           bg="#A67360", fg="#F2F2F2").grid(row=1, column=1)
+
+    itemDetailFrame.place(x=0, y=0, width=w, height=h)
+    itemImageFrame.grid(row=0, column=0)
+    itemInformationFrame.grid(row=0, column=1)
+
+
+def addToCart(FetchData):
+    userID = FetchData[0][0]
+    itemID = FetchData[0][1]
+    insert = """
+    INSERT INTO Carts(User_ID,Item_ID)
+    VALUES (?,?)
+    """
+    cursor.execute(insert, [userID, itemID])
+    connect.commit()
+    messagebox.showinfo("Admin : ", "Add To Carts Success!!!")
+    itemDetailFrame.destroy()
+    shopMainPage(root)
 
 def getImg(index):
     imageList = [pic, pic2, pic3, pic4]
@@ -224,7 +282,8 @@ getItemName = StringVar()
 getAmount = IntVar()
 imageIndex = StringVar()
 getPrice = StringVar()
-# userAddItemPage(root)
-userOwnItem(root)
-# shopMainPage(root)
+#itemDetailPage(root,4)
+#userAddItemPage(root)
+#userOwnItem(root)
+shopMainPage(root)
 root.mainloop()
