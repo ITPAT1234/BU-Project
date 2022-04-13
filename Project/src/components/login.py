@@ -1,2 +1,8 @@
-print("Hi")
-print("HI Dew")
+from tkinter import *
+
+def loginlayout():
+
+root = loginlayout()
+root.mainloop()
+
+
