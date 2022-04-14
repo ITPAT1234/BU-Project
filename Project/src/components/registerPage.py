@@ -22,15 +22,12 @@ def regisclick() :
     global cfpwd
     global regisframe
     
-    root.title("Welcome to User Registration : ")
-    root.config(bg='lightblue')
-    
     regisframe = Frame(root,bg='#F2CB9B')
     regisframe.rowconfigure((0,1,2,3,4,5,6,7,8,9,10),weight=1)
     regisframe.columnconfigure((0,1),weight=1)
     
     
-    Label(regisframe,image=img2,bg='#F2CB9B').grid(row=1,column=0,columnspan=2)
+    Label(regisframe,image=LOGO,bg='#F2CB9B').grid(row=1,column=0,columnspan=2)
    
     Label(regisframe,text='Username : ',bg='#A67360',fg='#f6f5f5').grid(row=2,column=0,sticky='e',padx=10)
     newuser = Entry(regisframe,width=20,bg='#f6f5f5',textvariable=newuserinfo)
@@ -44,8 +41,8 @@ def regisclick() :
     cfpwd = Entry(regisframe,width=20,bg='#f6f5f5',textvariable=cfinfo,show='*')
     cfpwd.grid(row=4,column=1,sticky='w',padx=10)
 
-    Label(regisframe,text="Year : ",bg='#f6f5f5',fg='#6FB2D2').grid(row=5,column=0,sticky='e',padx=10)
-    newyear = Spinbox(regisframe, from_=1, to=4,width=5, justify=CENTER, fg='#6FB2D2', bd=0, textvariable=yearinfo).grid(row=5,column=1,sticky='w',padx=10)
+    Label(regisframe,text="Year : ",bg='#A67360',fg='#f6f5f5').grid(row=5,column=0,sticky='e',padx=10)
+    newyear = Entry(regisframe, width=20, textvariable=yearinfo).grid(row=5,column=1,sticky='w',padx=10)
 
     Label(regisframe,text="Gender : ",bg='#f6f5f5',fg='#A67360').grid(row=7,column=0,sticky='e',padx=10)
     
@@ -55,8 +52,8 @@ def regisclick() :
     genderinfo.set('Male')
     
 
-    Button(regisframe,text="Cancel", activebackground='#F2CB9B',bg='#D9BA82',command=regisframe.destroy).grid(row=11,column=0,columnspan=2,ipady=5,ipadx=5,pady=5,padx=10,sticky='s')
-    Button(regisframe,text="Register",command=lambda:registration()).grid(row=11,column=1,columnspan=2,ipady=5,ipadx=5,pady=5,padx=10,sticky='s')
+    Button(regisframe,text="Cancel", activebackground='#F2CB9B',bg='#D9BA82',command=regisframe.destroy,bd=0).grid(row=11,column=0,columnspan=2,ipady=5,ipadx=5,pady=5,padx=10,sticky='s')
+    Button(regisframe,text="Register",bd=0,command=lambda:registration()).grid(row=11,column=1,columnspan=2,ipady=5,ipadx=5,pady=5,padx=10,sticky='s')
     #fullname.focus_force()
     regisframe.grid(row=1,column=1,columnspan=2,rowspan=2,sticky='news')
 
@@ -75,26 +72,23 @@ def registration() :
         cfpwd.focus_force()
     else :
 
-        sql = '''INSERT into student values(?,?,)'''
+        sql = '''INSERT into Users(username,password,gender,year) values(?,?,?,?)'''
         
-        cursor.execute(sql,[newuserinfo.get(),newpwdinfo.get()])
-        conn.commit()
+        cursor.execute(sql,[newuserinfo.get(),newpwdinfo.get(),genderinfo.get(),yearinfo.get()])
+        connect.commit()
         
         messagebox.showinfo("Admin : ","Registration successfully")
             
 w = 1000
 h = 800
     
-conn = sqlite3.connect('school11.db')
-cursor = conn.cursor()
+connect = sqlite3.connect("../../DB/BumarketApp.db")
+cursor = connect.cursor()
 print("Connection Succesfully")
 
 root = mainwindow()
 regisframe = Frame(root)
-profileframe = Frame(root,bg='#F2CB9B')
-
-img2 = PhotoImage(file='LOGO.png').subsample(5,5)
-
+LOGO = PhotoImage(file="../../images/LOGO.png").subsample(4, 4)
 newuserinfo = StringVar()
 newpwdinfo = StringVar()
 cfinfo = StringVar()
