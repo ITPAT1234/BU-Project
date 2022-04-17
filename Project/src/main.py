@@ -23,7 +23,7 @@ def mainwindow():
     return root
 
 # ShopMainPage
-def shopMainPage(root):
+def shopMainPage(root,userID=0):
     Fetch = """
         SELECT Users.username,Items.itemName,Items.img_index,Users.User_ID,Items.Item_ID
         FROM Items
@@ -384,8 +384,128 @@ def registration() :
         connect.commit()
         
         messagebox.showinfo("Admin : ","Registration successfully")
-        
 
+        
+# Payment Page
+def paymentPage(root,userID,itemID):
+    fetchUserDetail = """
+    SELECT Users.User_ID,Users.username,Users.user_Money
+    FROM Users
+    WHERE Users.User_ID = ?
+    """
+    fetchItemDetail = """
+    SELECT Items.Item_ID,Items.itemName,Items.User_ID,Items.amount,Items.sell_Count,Items.img_index,Items.price,Users.username
+    FROM Items
+    INNER JOIN Users
+    ON Users.User_ID = Items.User_ID
+    WHERE Items.Item_ID = ?
+    """
+    cursor.execute(fetchUserDetail,[userID])
+    fetchUserData = cursor.fetchall()
+    cursor.execute(fetchItemDetail,[itemID])
+    fetchItemData = cursor.fetchall()
+    print(fetchUserData,fetchItemData[0])
+    paymentFrame = Frame(root,bg="#D9BA82")
+    itemImageFrame = Frame(paymentFrame)
+    paymentDetail = Frame(paymentFrame,bg="#D9BA82")
+    paymentFrame.columnconfigure((0, 1),weight=1)
+    paymentFrame.rowconfigure((0, 1),weight=1)
+    userID = fetchUserData[0][0]
+    itemID = fetchItemData[0][0]
+    userMoney = fetchUserData[0][2]
+    itemPrice = fetchItemData[0][6]
+    amount = fetchItemData[0][3]
+
+    BackButton = Button(paymentFrame, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2").grid(
+        row=0, column=0, sticky="NW", padx=10, pady=10)
+    
+    Label(itemImageFrame,image=getImg(fetchItemData[0][5])).grid(row=0, column=0,pady=10)
+    Label(itemImageFrame,text=fetchItemData[0][1]).grid(row=1,column=0,pady=10)
+    Label(itemImageFrame,text="Vendor : %s"%(fetchItemData[0][7])).grid(row=2,column=0,pady=10)
+
+    Label(paymentDetail, text=("User Money : %20s" %
+          userMoney), width=20, anchor="w", relief="solid").grid(row=0, column=0, pady=10)
+    Label(paymentDetail, text=("Item Price : %24s" %
+          itemPrice), width=20, anchor="w", relief="solid").grid(row=1, column=0, pady=10)
+    Label(paymentDetail, text=("Summary : %25s" %
+          summaryPrice(fetchUserData[0][2],fetchItemData[0][6])), width=20, anchor="w", relief="solid").grid(row=2, column=0, pady=10)
+    Label(paymentDetail, text=("Amount : %29s" %
+          amount), width=20, anchor="w", relief="solid").grid(row=3, column=0, pady=10)
+    Label(paymentDetail, text="Buy :", anchor="w",bg="#D9BA82").grid(row=4, column=0, pady=10,sticky="W")
+    Scale(paymentDetail,from_=0,to=fetchItemData[0][3],orient="horizontal",variable=buyAmount).grid(row=5,column=0,sticky="nesw")
+
+    if summaryPrice(fetchUserData[0][2],fetchItemData[0][6]) <= 0:
+       Button(paymentDetail,text="Buy Now",bg="#A67360", fg="#F2F2F2",state="disabled").grid(row=6, column=0,sticky="news",pady=10)
+    else:
+       Button(paymentDetail,text="Buy Now",bg="#A67360", fg="#F2F2F2",command=lambda : buyIt(fetchUserData[0][2],fetchItemData[0][6],amount,buyAmount,userID,itemID)).grid(row=6, column=0,sticky="news",pady=10)
+
+
+    paymentFrame.place(x=0, y=0, width=w, height=h)
+    itemImageFrame.grid(row=0, column=0)
+    paymentDetail.grid(row=0, column=1)
+
+def summaryPrice(userMoney,itemPrice):
+    result = userMoney - itemPrice
+    return result
+
+def buyIt(userMoney,itemPrice,amount,buyAmount,userID,itemID):
+    updateUser = f"""
+    UPDATE Users
+    SET user_Money = {summaryPrice(userMoney,itemPrice)}
+    WHERE User_ID = ?
+
+    """
+    updateItem = f"""
+    UPDATE Items
+    SET amount = {amount - buyAmount.get()} , sell_Count = {buyAmount.get()}
+    WHERE Item_ID = ?
+    """
+    cursor.execute(updateUser,[userID])
+    cursor.execute(updateItem,[itemID])
+    connect.commit()
+    messagebox.showinfo("Admin : ", "Buy Success!!!")
+
+def summaryPrice(userMoney,itemPrice):
+    result = userMoney - itemPrice
+    return result
+
+    
+# Login Page
+def loginPage(root):
+    global loginframe
+
+    loginframe = Frame(root, bg='#D9BA82')
+    loginframe.rowconfigure((0, 1, 2, 3), weight=1)
+    loginframe.columnconfigure((0, 1), weight=1)
+    Label(loginframe, text="Account Login", font="Garamond 26 bold",fg='#4a3933', compound=LEFT, bg='#D9BA82').place(x=380,y=30)
+
+    Label(loginframe, text="Username : ", bg='#D9BA82',fg='#4a3933', padx=20,).grid(row=1, column=0, sticky='e')
+    Entry(loginframe,bg="#A67360", fg='#4a3933',width=20,textvariable=usernameInput).grid(row=1, column=1, sticky='w', padx=20,columnspan=3)
+    Label(loginframe, text="Password  : ", bg='#D9BA82',fg='#4a3933', padx=20).grid(row=2, column=0, sticky='e')
+    Entry(loginframe, bg='#A67360', fg='#4a3933',width=20, show='*',textvariable=passwordInput).grid(row=2, column=1, sticky='w', padx=20,columnspan=3)
+
+    Button(loginframe, text="Login", width=10,command=lambda :checkLogin(usernameInput.get(),passwordInput.get())).grid(row=3, column=0, pady=10, ipady=10, padx=20)
+    Button(loginframe, text="Register", width=10).grid(row=3, column=1, pady=10, ipady=10,  padx=20)
+    Button(loginframe, text="Exit", width=10).grid(row=3, column=2, pady=10, ipady=10, padx=20)
+    loginframe.grid(row=1, column=0, columnspan=3, rowspan=2, sticky='news')
+
+
+def checkLogin(username,password):
+    fetch = """
+    SELECT *
+    FROM Users
+    WHERE Users.username = ? AND Users.password = ?
+    """
+    cursor.execute(fetch, [username,password])
+    fetchData = cursor.fetchall()
+    if fetchData :
+        messagebox.showinfo("Admin : ", "Login Success!!!")
+        shopMainPage(root,fetchData[0][0])
+        loginframe.destroy()
+    else :
+        messagebox.showinfo("Admin : ", "Username and Password is Incorrect !!!")
+
+# Global Funtionc
 def getImg(index):
     imageList = [pic, pic2, pic3, pic4]
     return imageList[index]
@@ -410,6 +530,8 @@ pic = PhotoImage(file="../images/Food1.png").subsample(3, 3)
 pic2 = PhotoImage(file="../images/book1.png").subsample(3, 3)
 pic3 = PhotoImage(file="../images/cat1.png").subsample(3, 3)
 pic4 = PhotoImage(file="../images/pen.png").subsample(3, 3)
+usernameInput = StringVar()
+passwordInput = StringVar()
 getItemName = StringVar()
 getAmount = IntVar()
 imageIndex = StringVar()
@@ -419,10 +541,13 @@ newpwdinfo = StringVar()
 cfinfo = StringVar()
 yearinfo = StringVar()
 genderinfo = StringVar()
+buyAmount = IntVar()
 #itemDetailPage(root,4)
 #userAddItemPage(root)
 #userOwnItem(root)
 #shopMainPage(root)
 #cartPage(root,1)
-registerPage()
+#registerPage()
+#paymentPage(root,1,1)
+loginPage(root)
 root.mainloop()
