@@ -48,7 +48,7 @@ def shopMainPage(root,userID=0):
             row=2, column=i, sticky="S")
         Label(renderFrame, text=("Vendor : %s" % firstColumn[i][0]), width=12).grid(
             row=3, column=i, sticky="S")
-        Button(renderFrame, text="Detail", width=12,command=lambda i=i : redirectToItemDetail(firstColumn[i][4]) ,
+        Button(renderFrame, text="Detail", width=12,command=lambda i=i : shopMainPageRedirect(itemDetailPage,firstColumn[i][4],userID),
                bd=0, bg="#A67360").grid(row=4, column=i)
 
     if secondColumn:
@@ -60,17 +60,17 @@ def shopMainPage(root,userID=0):
                 row=7, column=i, sticky="S")
             Label(renderFrame, text=("Vendor : %s" % secondColumn[i][0]), width=12).grid(
                 row=8, column=i, sticky="S")
-            Button(renderFrame, text="Detail", width=12, bd=0,command=lambda i=i :redirectToItemDetail(secondColumn[i][4]),
+            Button(renderFrame, text="Detail", width=12, bd=0,command=lambda i=i :shopMainPageRedirect(itemDetailPage,secondColumn[i][4],userID),
                    bg="#A67360").grid(row=9, column=i, padx=10)
 
-            Button(itemCard, text="Profile", bg="#A67360", fg="#F2F2F2").grid(
+            Button(itemCard, text="Profile", bg="#A67360", fg="#F2F2F2",command=lambda : redirectToWithUserID(renderFrame,userPage,userID)).grid(
                 row=3, column=3, sticky="e", padx=50, columnspan=2)
 
     renderFrame.grid(row=1, column=0, columnspan=4)
 
 
-def redirectToItemDetail(itemID):
-    itemDetailPage(root,itemID)
+def shopMainPageRedirect(Page,ID,userID):
+    Page(root,ID,userID)
 
 # UserOwnItemPage
 def mutiCount(FetchData, index):
@@ -79,13 +79,12 @@ def mutiCount(FetchData, index):
         summary += FetchData[i][index]
     return summary
 
-def userOwnItem(root):
+def userOwnItem(root,userID=0):
 
     global userOwnItemFrame
     global BackButton
     global AddItemPageButton
 
-    userID = 1
     fetch = f"""
 	SELECT Users.username,Items.itemName,Items.amount,Items.img_index,Items.sell_count
 	FROM Users
@@ -102,9 +101,9 @@ def userOwnItem(root):
     renderItemListFrame = Frame(userOwnItemFrame, bg="#F2F2F2")
     userOwnItemFrame.columnconfigure((1, 2, 3), weight=1)
     userOwnItemFrame.rowconfigure((0, 1, 2, 3), weight=1)
-    BackButton = Button(userOwnItemFrame, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2").grid(
+    BackButton = Button(userOwnItemFrame, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2",command=lambda : redirectToWithUserID(userOwnItemFrame,userPage, userID)).grid(
         row=0, column=0, sticky="NW", padx=10, pady=10)
-    AddItemPageButton = Button(userOwnItemFrame, text="Add Item Page", bd=0, bg="#A67360", fg="#F2F2F2", command=lambda: redirecToAddItemPage(userOwnItemFrame, userAddItemPage, userID)).grid(
+    AddItemPageButton = Button(userOwnItemFrame, text="Add Item Page", bd=0, bg="#A67360", fg="#F2F2F2", command=lambda: redirectToWithUserID(userOwnItemFrame, userAddItemPage, userID)).grid(
         row=0, column=3, sticky="NE", padx=10, pady=10)
 
     Label(userOwnItemFrame, image=LOGO,  bg="#D9BA82").grid(
@@ -128,14 +127,15 @@ def userOwnItem(root):
     renderItemListFrame.grid(row=4, column=0, columnspan=4, pady=50)
 
 # UserAddItemPage
-def userAddItemPage(root,userID):
+def userAddItemPage(root,userID=0):
 	
-    userAddItemPageFrame = Frame(root)
+    userAddItemPageFrame = Frame(root,bg="#D9BA82")
     userAddItemPageFrame.columnconfigure((0, 1), weight=1)
+    userAddItemPageFrame.rowconfigure((0, 1,2), weight=1)
     itemPicListFrame = Frame(userAddItemPageFrame, bg="#F2F2F2")
-    userInputFrame = Frame(userAddItemPageFrame)
+    userInputFrame = Frame(userAddItemPageFrame,bg="#D9BA82")
 
-    Button(root, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2", command=lambda : redirectTo(userAddItemPageFrame,userOwnItem)).grid(
+    Button(userAddItemPageFrame, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2", command=lambda : redirectToWithUserID(userAddItemPageFrame,userOwnItem,userID)).grid(
         row=0, column=0, sticky="NW", padx=10, pady=10)
 
     Label(itemPicListFrame, image=pic).grid(row=0, column=0, padx=20, pady=20)
@@ -147,29 +147,28 @@ def userAddItemPage(root,userID):
     Label(itemPicListFrame, image=pic4).grid(row=2, column=1, padx=20, pady=20)
     Label(itemPicListFrame, text="4 : Stationery").grid(row=3, column=1)
 
-    Label(userInputFrame, text="Item Name").grid(
+    Label(userInputFrame, text="Item Name",bg="#D9BA82").grid(
         row=0, column=0, sticky="WN", columnspan=4)
     Entry(userInputFrame, width=20, textvariable=getItemName).grid(
         row=1, column=0, columnspan=4)
-    Label(userInputFrame, text="Amount").grid(
+    Label(userInputFrame, text="Amount",bg="#D9BA82").grid(
         row=2, column=0, sticky="WN", columnspan=4)
     Entry(userInputFrame, width=20, textvariable=getAmount).grid(
         row=3, column=0, columnspan=4)
-    Label(userInputFrame, text="Price").grid(
+    Label(userInputFrame, text="Price",bg="#D9BA82").grid(
         row=4, column=0, sticky="WN", columnspan=4)
     Entry(userInputFrame, width=20, textvariable=getPrice).grid(
         row=5, column=0, columnspan=4)
-    Label(userInputFrame, text="Choose Images").grid(
+    Label(userInputFrame, text="Choose Images",bg="#D9BA82").grid(
         row=6, column=0, sticky="WN", columnspan=4)
     Spinbox(userInputFrame, from_=0, to=4,
             textvariable=imageIndex).grid(row=7)
     Button(userInputFrame, text="Submit", bd=0,
            bg="#A67360", command=submit).grid(row=8, pady=20, sticky="news")
 
-    userAddItemPageFrame.grid(
-        row=0, column=0, columnspan=4, rowspan=4)
-    itemPicListFrame.grid(row=0, column=0)
-    userInputFrame.grid(row=0, column=2, padx=30)
+    userAddItemPageFrame.place(x=0, y=0, width=w, height=h)
+    itemPicListFrame.grid(row=1, column=0)
+    userInputFrame.grid(row=1, column=1)
 
 
 def imageIndexValue(index):
@@ -200,7 +199,7 @@ def submit():
     messagebox.showinfo("Admin : ", "Post a Product Success !!!")
 
 # ITEMDetailPage
-def itemDetailPage(root, itemID):
+def itemDetailPage(root, itemID,userID):
     fetch = f"""
 	SELECT Items.User_ID,Items.Item_ID,Users.username,Items.itemName,Items.amount,Items.img_index, Items.price
 	FROM Items
@@ -217,7 +216,7 @@ def itemDetailPage(root, itemID):
     itemDetailFrame.rowconfigure((0, 1), weight=1)
     itemImageFrame = Frame(itemDetailFrame)
     itemInformationFrame = Frame(itemDetailFrame, bg="#D9BA82")
-    BackButton = Button(itemDetailFrame, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2",command=lambda :redirectTo(itemDetailFrame,shopMainPage)).grid(
+    BackButton = Button(itemDetailFrame, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2",command=lambda :redirectToWithUserID(itemDetailFrame,shopMainPage,userID)).grid(
         row=0, column=0, sticky="NW", padx=10, pady=10)
 
     Label(itemImageFrame, image=getImg(FetchData[0][5])).grid(row=0, column=0)
@@ -232,8 +231,8 @@ def itemDetailPage(root, itemID):
           FetchData[0][4]), width=20, height=2, anchor="w", relief="solid").grid(row=3, column=0, pady=10)
 
     Button(itemDetailFrame, text="Add To Cart", bd=0, width=12,
-           bg="#A67360", fg="#F2F2F2", command=lambda: addToCart(FetchData)).grid(row=1, column=0)
-    Button(itemDetailFrame, text="Buy Now!", bd=0, width=12,
+           bg="#A67360", fg="#F2F2F2", command=lambda: addToCart(FetchData,userID)).grid(row=1, column=0)
+    Button(itemDetailFrame, text="Buy", bd=0, width=12,command=lambda: redirectToPayment(itemID,userID),
            bg="#A67360", fg="#F2F2F2").grid(row=1, column=1)
 
     itemDetailFrame.place(x=0, y=0, width=w, height=h)
@@ -241,7 +240,7 @@ def itemDetailPage(root, itemID):
     itemInformationFrame.grid(row=0, column=1)
 
 
-def addToCart(FetchData):
+def addToCart(FetchData,userID):
     userID = FetchData[0][0]
     itemID = FetchData[0][1]
     insert = """
@@ -252,12 +251,15 @@ def addToCart(FetchData):
     connect.commit()
     messagebox.showinfo("Admin : ", "Add To Carts Success!!!")
     itemDetailFrame.destroy()
-    shopMainPage(root)
+    shopMainPage(root,userID)
+
+def redirectToPayment(itemID, userID):
+    itemDetailFrame.destroy()
+    paymentPage(root,userID,itemID)
 
     
 # Cart Page 
-
-def cartPage(root, userID):
+def cartPage(root, userID=0):
     Fetch = """
     SELECT Carts.Cart_ID,Carts.Item_ID,Carts.User_ID,Items.itemName,Items.img_index
     FROM Carts
@@ -277,7 +279,7 @@ def cartPage(root, userID):
     secondColumnFrame = Frame(cartPageFrame, bg="#F2F2F2")
     firstColumn = FetchData[:4]
     secondColumn = FetchData[4:8]
-    BackButton = Button(cartPageFrame, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2").grid(
+    BackButton = Button(cartPageFrame, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2",command=lambda : redirectToWithUserID(cartPageFrame, userPage, userID)).grid(
         row=0, column=0, sticky="NW", padx=10, pady=10)
 
     for i in range(len(firstColumn)):
@@ -318,11 +320,11 @@ def deleteItemInCart(cartID, userID):
     cursor.execute(delete, [cartID])
     connect.commit()
     cartPageFrame.destroy()
-    CartPage(root, userID)
+    cartPage(root, userID)
 
 # Register Page 
 
-def registerPage() :
+def registerPage(root) :
     global newuser
     global newpwd
     global cfpwd
@@ -358,9 +360,8 @@ def registerPage() :
     genderinfo.set('Male')
     
 
-    Button(regisframe,text="Cancel", activebackground='#F2CB9B',bg='#D9BA82',command=regisframe.destroy,bd=0).grid(row=11,column=0,columnspan=2,ipady=5,ipadx=5,pady=5,padx=10,sticky='s')
+    Button(regisframe,text="Cancel", activebackground='#F2CB9B',bg='#D9BA82',command=lambda : redirectTo(regisframe,loginPage),bd=0).grid(row=11,column=0,columnspan=2,ipady=5,ipadx=5,pady=5,padx=10,sticky='s')
     Button(regisframe,text="Register",bd=0,command=lambda:registration()).grid(row=11,column=1,columnspan=2,ipady=5,ipadx=5,pady=5,padx=10,sticky='s')
-    #fullname.focus_force()
     regisframe.grid(row=1,column=1,columnspan=2,rowspan=2,sticky='news')
 
 def registration() :
@@ -388,6 +389,9 @@ def registration() :
         
 # Payment Page
 def paymentPage(root,userID,itemID):
+
+    global paymentFrame 
+
     fetchUserDetail = """
     SELECT Users.User_ID,Users.username,Users.user_Money
     FROM Users
@@ -404,7 +408,6 @@ def paymentPage(root,userID,itemID):
     fetchUserData = cursor.fetchall()
     cursor.execute(fetchItemDetail,[itemID])
     fetchItemData = cursor.fetchall()
-    print(fetchUserData,fetchItemData[0])
     paymentFrame = Frame(root,bg="#D9BA82")
     itemImageFrame = Frame(paymentFrame)
     paymentDetail = Frame(paymentFrame,bg="#D9BA82")
@@ -416,16 +419,16 @@ def paymentPage(root,userID,itemID):
     itemPrice = fetchItemData[0][6]
     amount = fetchItemData[0][3]
 
-    BackButton = Button(paymentFrame, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2").grid(
+    BackButton = Button(paymentFrame, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2",command= lambda : redirectToItemDetail(itemID,userID)).grid(
         row=0, column=0, sticky="NW", padx=10, pady=10)
     
     Label(itemImageFrame,image=getImg(fetchItemData[0][5])).grid(row=0, column=0,pady=10)
     Label(itemImageFrame,text=fetchItemData[0][1]).grid(row=1,column=0,pady=10)
     Label(itemImageFrame,text="Vendor : %s"%(fetchItemData[0][7])).grid(row=2,column=0,pady=10)
 
-    Label(paymentDetail, text=("User Money : %20s" %
+    Label(paymentDetail, text=("User Money : %19s" %
           userMoney), width=20, anchor="w", relief="solid").grid(row=0, column=0, pady=10)
-    Label(paymentDetail, text=("Item Price : %24s" %
+    Label(paymentDetail, text=("Item Price : %23s" %
           itemPrice), width=20, anchor="w", relief="solid").grid(row=1, column=0, pady=10)
     Label(paymentDetail, text=("Summary : %25s" %
           summaryPrice(fetchUserData[0][2],fetchItemData[0][6])), width=20, anchor="w", relief="solid").grid(row=2, column=0, pady=10)
@@ -443,6 +446,11 @@ def paymentPage(root,userID,itemID):
     paymentFrame.place(x=0, y=0, width=w, height=h)
     itemImageFrame.grid(row=0, column=0)
     paymentDetail.grid(row=0, column=1)
+
+
+def redirectToItemDetail(itemID,userID):
+    paymentFrame.destroy() 
+    itemDetailPage(root,itemID,userID)
 
 def summaryPrice(userMoney,itemPrice):
     result = userMoney - itemPrice
@@ -485,8 +493,8 @@ def loginPage(root):
     Entry(loginframe, bg='#A67360', fg='#4a3933',width=20, show='*',textvariable=passwordInput).grid(row=2, column=1, sticky='w', padx=20,columnspan=3)
 
     Button(loginframe, text="Login", width=10,command=lambda :checkLogin(usernameInput.get(),passwordInput.get())).grid(row=3, column=0, pady=10, ipady=10, padx=20)
-    Button(loginframe, text="Register", width=10).grid(row=3, column=1, pady=10, ipady=10,  padx=20)
-    Button(loginframe, text="Exit", width=10).grid(row=3, column=2, pady=10, ipady=10, padx=20)
+    Button(loginframe, text="Register", width=10,command=lambda : redirectTo(loginframe,registerPage)).grid(row=3, column=1, pady=10, ipady=10,  padx=20)
+    Button(loginframe, text="Exit", width=10,command=quit).grid(row=3, column=2, pady=10, ipady=10, padx=20)
     loginframe.grid(row=1, column=0, columnspan=3, rowspan=2, sticky='news')
 
 
@@ -505,6 +513,51 @@ def checkLogin(username,password):
     else :
         messagebox.showinfo("Admin : ", "Username and Password is Incorrect !!!")
 
+
+# User Page 
+def userPage(root, userID=0):
+
+    global userPageFrame
+
+    fetch = """
+	SELECT * 
+	FROM Users
+	WHERE Users.User_ID = ?
+        """
+    cursor.execute(fetch, [userID])
+    fetchData = cursor.fetchall()
+    print(fetchData)
+    userPageFrame = Frame(root, bg="#D9BA82")
+    userPageFrame.columnconfigure((0, 1), weight=1)
+    userDetailFrame = Frame(userPageFrame, bg="#D9BA82")
+    userButtonFrame = Frame(userPageFrame, bg="#D9BA82")
+    BackButton = Button(userPageFrame, text="Back", bd=0, width=12, bg="#A67360", fg="#F2F2F2",command=lambda : userPageRedirect(shopMainPage,userID)).grid(
+        row=0, column=0, sticky="NW", padx=10, pady=10)
+
+    Label(userDetailFrame, text="Username : %s" % fetchData[0][1], width=25, bg="#F2CB9B", relief="solid").grid(
+        row=0, column=0, columnspan=2, pady=20)
+    Label(userDetailFrame, text="Gender : %s" % fetchData[0][3], width=25, bg="#F2CB9B", relief="solid").grid(
+        row=1, column=0, columnspan=2, pady=20)
+    Label(userDetailFrame, text="Year of birth : %s" % fetchData[0][4], width=25, bg="#F2CB9B", relief="solid").grid(
+        row=2, column=0, columnspan=2, pady=20)
+    Label(userDetailFrame, text="User Money : %s" % fetchData[0][5], width=25, bg="#F2CB9B", relief="solid").grid(
+        row=3, column=0, columnspan=2, pady=20)
+
+    Button(userButtonFrame, text="Cart Page", bd=0, width=12, bg="#A67360", fg="#F2F2F2",command=lambda : userPageRedirect(cartPage,userID) ).grid(
+        row=4, column=0, sticky="NW", padx=30)
+    Button(userButtonFrame, text="Add Money", bd=0, width=12, bg="#A67360", fg="#F2F2F2").grid(
+        row=4, column=1, sticky="NW", padx=30)
+    Button(userButtonFrame, text="Own Item Page", bd=0, width=12, bg="#A67360", fg="#F2F2F2",command=lambda : userPageRedirect(userOwnItem,userID)).grid(
+        row=4, column=2, sticky="NW", padx=30)
+
+    userPageFrame.place(x=0, y=0, width=w, height=h)
+    userDetailFrame.grid(row=1, column=0, columnspan=2, pady=80)
+    userButtonFrame.grid(row=2, column=0, columnspan=2, pady=50)
+
+def userPageRedirect(goTo,ID):
+    userPageFrame.destroy() 
+    goTo(root,ID)
+
 # Global Funtionc
 def getImg(index):
     imageList = [pic, pic2, pic3, pic4]
@@ -515,8 +568,7 @@ def redirectTo(currentFrame, goto):
     currentFrame.destroy()
     goto(root)
 
-
-def redirecToAddItemPage(currentFrame, goto, userID):
+def redirectToWithUserID(currentFrame, goto, userID):
     currentFrame.destroy()
     goto(root, userID)
 
@@ -545,9 +597,10 @@ buyAmount = IntVar()
 #itemDetailPage(root,4)
 #userAddItemPage(root)
 #userOwnItem(root)
-#shopMainPage(root)
+#shopMainPage(root,1)
 #cartPage(root,1)
 #registerPage()
 #paymentPage(root,1,1)
 loginPage(root)
+#userPage(root,1)
 root.mainloop()
