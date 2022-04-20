@@ -240,7 +240,7 @@ def itemDetailPage(root, itemID,userID):
     itemInformationFrame.grid(row=0, column=1)
 
 
-def addToCart(FetchData,userID):
+def addToCart(FetchData,UserID):
     userID = FetchData[0][0]
     itemID = FetchData[0][1]
     insert = """
@@ -251,7 +251,7 @@ def addToCart(FetchData,userID):
     connect.commit()
     messagebox.showinfo("Admin : ", "Add To Carts Success!!!")
     itemDetailFrame.destroy()
-    shopMainPage(root,userID)
+    shopMainPage(root,UserID)
 
 def redirectToPayment(itemID, userID):
     itemDetailFrame.destroy()
