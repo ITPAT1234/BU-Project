@@ -31,7 +31,8 @@ def renderItemList(root):
     renderFrame.rowconfigure((0, 1, 4, 5, 9), weight=1)
     renderFrame.columnconfigure((0, 1, 2, 3), weight=1)
     firstColumn = FetchData[:4]
-    secondColumn = FetchData[4:]
+    secondColumn = FetchData[4:8]
+    thirdColumn = FetchData[8:]
     for i in range(len(firstColumn)):
         itemCard = LabelFrame(renderFrame).grid(row=1)
         Label(renderFrame, image=pic, bg='#F2F2F2',
@@ -55,8 +56,10 @@ def renderItemList(root):
             Button(renderFrame, text="Detail", width=12, bd=0,
                    bg="#A67360").grid(row=9, column=i, padx=10)
 
-            Button(itemCard, text="Profile", bg="#A67360", fg="#F2F2F2").grid(
-                row=3, column=3, sticky="e", padx=50, columnspan=2)
+    Button(renderFrame, text="Profile", bg="#A67360", fg="#F2F2F2",command=lambda : redirectToWithUserID(renderFrame,userPage,userID)).grid(
+        row=10, column=0, sticky="w", padx=50,pady=50, columnspan=2)
+    Button(renderFrame, text="Logout", bg="#A67360", fg="#F2F2F2",command=lambda : logOut(renderFrame,loginPage)).grid(
+        row=10, column=3, sticky="e", padx=50,pady=50, columnspan=2)
 
     renderFrame.grid(row=1, column=0, columnspan=4)
 
@@ -64,20 +67,6 @@ def renderItemList(root):
 w = 1000
 h = 800
 root = mainwindow()
-# imageList = {
-#    "1" : ["../../images/Food1.png",None],
-#    "2" : ["../../images/book1.png",None],
-#    "3" : ["../../images/cat1.png",None],
-#    "4" : ["../../images/pen.png",None],
-# }
-#
-# def getImg(index):
-#    if index in imageList:
-#        if imageList[index][1] is None:
-#            print("loading image:", index)
-#            imageList[index][1] = PhotoImage(file=imageList[index][0])
-#        return imageList[index][1]
-#    return None
 pic = PhotoImage(file="../../images/Food1.png").subsample(3, 3)
 pic2 = PhotoImage(file="../../images/book1.png").subsample(3, 3)
 pic3 = PhotoImage(file="../../images/cat1.png").subsample(3, 3)
@@ -85,14 +74,3 @@ pic4 = PhotoImage(file="../../images/pen.png").subsample(3, 3)
 renderItemList(root)
 root.mainloop()
 cursor.close()
-
-# i = 0
-# for r in range(len(FetchData)):
-#  itemCard = LabelFrame(renderFrame, text="test",
-#                         bg="black").grid(row=0)
-#   for c in range(4):
-#        Label(itemCard, text="test", image=pic,
-#              bg='#F2F2F2').grid(row=((r//5)+5), column=c)
-#        Label(itemCard, text=FetchData[i][1]).grid(
-#            row=((r//5)+1), column=c)
-#    i += 1
